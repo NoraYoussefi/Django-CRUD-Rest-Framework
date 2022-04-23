@@ -6,14 +6,14 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser 
 from rest_framework import status
  
-from certification.models import certification
+# from certification.models import certification
 from certification.serializer import certificationSerializer
 
 
 @api_view(['GET', 'POST', 'DELETE'])
 def certification_list(request):
    if request.method == 'GET':
-        tutorials = certification.objects.all()
+        certification = certification.objects.all()
         
         title = request.GET.get('title', None)
         if title is not None:
@@ -29,7 +29,11 @@ def certification_list(request):
             certification_serializer.save()
             return JsonResponse(certification_serializer.data, status=status.HTTP_201_CREATED) 
         return JsonResponse(certification_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
- 
+   elif request.method == 'DELETE':
+        count = certification.objects.all().delete()
+        return JsonResponse({'message': '{} certification were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
 def certification_detail(request, pk):
     # find tutorial by pk (id)
@@ -49,5 +53,8 @@ def certification_detail(request, pk):
             certification_serializer.save() 
             return JsonResponse(certification_serializer.data) 
         return JsonResponse(certification_serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-    
+    elif request.method == 'DELETE': 
+        certification.delete() 
+        return JsonResponse({'message': 'certification was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+
         
